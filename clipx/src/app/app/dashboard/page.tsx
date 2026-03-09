@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Activity, Plus, Video, PlayCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { UpgradeModule } from '@/components/dashboard/UpgradeModule'
 
 export default async function DashboardPage() {
     const supabase = await createClient()
@@ -13,12 +14,22 @@ export default async function DashboardPage() {
         redirect('/login')
     }
 
-    const planType = 'free'
-    const balance = 90
-    const clips = [
-        { id: '1', title: 'Podcast Highlight - Productivity', status: 'completed', created_at: new Date().toISOString() },
-        { id: '2', title: 'Vlog Intro - Cyberpunk', status: 'processing', created_at: new Date().toISOString() },
-    ]
+    // Fetch user profile and credits
+    const { data: credits } = await supabase
+        .from('credits')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+    const { data: clips } = await supabase
+        .from('clips')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(3)
+
+    const planType = credits?.plan_type || 'free'
+    const balance = credits?.balance ?? 0
 
     return (
         <div className="space-y-8">
@@ -30,6 +41,8 @@ export default async function DashboardPage() {
                     </Button>
                 </Link>
             </div>
+
+            <UpgradeModule planType={planType} />
 
             <div className="grid md:grid-cols-3 gap-6">
                 <Card className="glass">
@@ -67,7 +80,6 @@ export default async function DashboardPage() {
             </div>
 
             <div>
-                <h2 className="text-2xl font-outfit font-bold mb-4">Recent Clips</h2>
                 <div className="grid md:grid-cols-3 gap-6">
                     {clips && clips.length > 0 ? (
                         clips.map((clip) => (

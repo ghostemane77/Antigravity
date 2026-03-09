@@ -1,4 +1,5 @@
 import { createAdminClient } from './supabase/admin'
+import { getPlanByType } from '@/constants/plans'
 
 export async function ensureCreditCycle(userId: string) {
     const adminSupabase = createAdminClient()
@@ -34,15 +35,21 @@ export async function ensureCreditCycle(userId: string) {
     const now = new Date()
     const cycleEnd = new Date(credits.cycle_end)
 
-    if (now > cycleEnd && credits.plan_type === 'free') {
-        // Refill 90 credits for Free plan every 15 days
+    if (now > cycleEnd) {
+        // Find plan config
+        const plan = getPlanByType(credits.plan_type)
+        const refillAmount = plan.credits
+
+        // Reset to full allowance every 30 days (or 15 for free?)
+        // Let's stick to 30 days for all paid, 15 for free as per current logic
+        const days = credits.plan_type === 'free' ? 15 : 30
         const nextEnd = new Date()
-        nextEnd.setDate(nextEnd.getDate() + 15)
+        nextEnd.setDate(nextEnd.getDate() + days)
 
         const { data: updatedCredits, error: updateError } = await adminSupabase
             .from('credits')
             .update({
-                balance: 90,
+                balance: refillAmount,
                 cycle_start: now.toISOString(),
                 cycle_end: nextEnd.toISOString(),
                 updated_at: now.toISOString()
@@ -55,7 +62,7 @@ export async function ensureCreditCycle(userId: string) {
             // Record in ledger
             await adminSupabase.from('credit_ledger').insert({
                 user_id: userId,
-                amount: 90,
+                amount: refillAmount,
                 reason: 'cycle_refill'
             })
             return updatedCredits
