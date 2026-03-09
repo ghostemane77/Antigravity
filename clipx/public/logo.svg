@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="300" height="100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8A2BE2" />
+      <stop offset="100%" stop-color="#ff00ff" />
+    </linearGradient>
+  </defs>
+  <rect x="10" y="25" width="50" height="50" rx="10" fill="url(#grad)" />
+  <polygon points="32,40 45,50 32,60" fill="white" />
+  <text x="75" y="65" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white">ClipX</text>
+</svg>
