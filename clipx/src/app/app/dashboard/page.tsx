@@ -64,7 +64,7 @@ export default async function DashboardPage() {
                         <Video className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">{clips.length}</div>
+                        <div className="text-3xl font-bold">{clips?.length || 0}</div>
                         <p className="text-xs text-muted-foreground mt-1">Created this month</p>
                     </CardContent>
                 </Card>

@@ -39,15 +39,37 @@ You will need:
 The database schema migration is located in `supabase/migrations/001_schema.sql`.
 Run this SQL script in your Supabase SQL editor to create all required tables, Enable RLS, and set up the Auth Triggers.
 
-### 3. Install and Run
+### 4. Build for Production
 ```bash
-# Install dependencies
-npm install
-
-# Run the dev server
-npm run dev
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the landing page.
+## Deployment
+
+### GitHub Preparation
+1. Ensure your `.env` and `.env.local` files are **not** tracked (this repo is already configured with a proper `.gitignore`).
+2. Push this repository to your GitHub account.
+
+### Vercel Deployment
+1. Connect your GitHub repository to Vercel.
+2. In the Vercel project settings, add the following **Environment Variables** (refer to `.env.example`):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+   - `NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID`
+   - `NEXT_PUBLIC_STRIPE_PRO_PRICE_ID`
+   - `NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID`
+3. Vercel will automatically detect the Next.js framework and deploy your app.
+
+### Stripe Webhook Configuration
+For production, you must set up a Webhook endpoint in your Stripe Dashboard pointing to:
+`https://your-domain.vercel.app/api/stripe/webhook`
+Register the following events:
+- `checkout.session.completed`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
 
 You're ready to go viral! 🚀
